@@ -1,13 +1,13 @@
-FROM golang:1.22-alpine AS build
-WORKDIR /app
-COPY go.mod main.go ./
-COPY web ./web
-RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o probe main.go
+FROM python:3.12-alpine
 
-FROM alpine:3.20
-RUN adduser -D -H -u 10001 probeuser
-COPY --from=build /app/probe /probe
-USER probeuser
+WORKDIR /app
+
+RUN pip install --no-cache-dir aiohttp==3.10.11
+
+COPY app.py /app/app.py
+
 EXPOSE 8080
+
 ENV PORT=8080
-ENTRYPOINT ["/probe"]
+
+CMD ["python", "/app/app.py"]
